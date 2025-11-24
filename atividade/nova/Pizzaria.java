@@ -43,7 +43,7 @@ public class Pizzaria {
                     alterarPedido(scanner, listaPedidos);
                     break;
                 case 3:
-                    listaClientes.add(adicionarCliente(scanner)); 
+                    listaClientes.add(adicionarCliente(scanner));
                     System.out.println("Cliente adicionado com sucesso!");
                     break;
                 case 4:
@@ -61,7 +61,7 @@ public class Pizzaria {
                     break;
             }
         }
-    
+
     }
 
     private static void fazerPedido(Scanner scanner, List<Pedido> listaPedidos, List<Cliente> listaClientes) {
@@ -172,10 +172,12 @@ public class Pizzaria {
             return;
         }
 
-        System.out.println("Selecione o pedido a ser alterado:");
         for (Pedido p : listaPedidos) {
             System.out.println(p);
         }
+
+        System.out.println("Selecione o pedido a ser alterado:");
+
         System.out.print("Digite o ID do pedido: ");
         int idPedido = scanner.nextInt();
         scanner.nextLine();
@@ -203,14 +205,208 @@ public class Pizzaria {
 
         switch (opcao) {
             case 1:
+                adicionarPizza(scanner, pedidoParaAlterar);
                 break;
             case 2:
+                removerPizza(scanner, pedidoParaAlterar);
                 break;
             case 3:
+                alterarSaborPizza(scanner, pedidoParaAlterar);
                 break;
             default:
                 System.out.println("Opção inválida.");
         }
+    }
+
+    private static void adicionarPizza(Scanner scanner, Pedido pedidoParaAlterar) {
+        System.out.println("ADICIONAR PIZZA AO PEDIDO");
+
+        int x = 1;
+        System.out.println("Qual o tamanho da pizza? ");
+        System.out.println("Selecione um tamanho: ");
+        for (TamanhoPizza tamanhos : Pizza.TamanhoPizza.values()) {
+            System.out.println(x+" - "+tamanhos);
+            x++;
+        }
+        System.out.print("Opção: ");
+        int tamanho = scanner.nextInt();
+        scanner.nextLine();
+
+        int quantiSabores = 0;
+        while (quantiSabores < 1 || quantiSabores > 4) {
+            System.out.println("Digite a quantidade de sabores: 1 - 4 ");
+            System.out.print("Opção: ");
+            quantiSabores = scanner.nextInt();
+            scanner.nextLine();
+        }
+
+        Cardapio cardapio = new Cardapio();
+        List<String> saboresList = new ArrayList<>();
+        List<String> saboresSelect = new ArrayList<>();
+
+        for (int i = 0; i < quantiSabores; i++) {
+            System.out.println("Selecione um sabor: ");
+
+            x = 1;
+            for (String sabor : cardapio.getCardapio().keySet()) {
+                saboresList.add(sabor);
+                System.out.println(x+" - "+sabor);
+                x++;
+            }
+            System.out.print("Opção: ");
+            int opcao = scanner.nextInt();
+            scanner.nextLine();
+            saboresSelect.add(saboresList.get(opcao-1));
+        }
+
+        Pizza novaPizza = new Pizza(saboresSelect, cardapio.getPrecoJusto(saboresSelect), TamanhoPizza.getByIndex(tamanho-1));
+        pedidoParaAlterar.getPizzas().add(novaPizza);
+
+        pedidoParaAlterar.setValorTotal(somarPizzas(pedidoParaAlterar.getPizzas()));
+
+        System.out.println("Pizza adicionada com sucesso ao pedido!");
+    }
+
+    private static void removerPizza(Scanner scanner, Pedido pedidoParaAlterar) {
+        System.out.println("REMOVER PIZZA DO PEDIDO");
+
+        if (pedidoParaAlterar.getPizzas().isEmpty()) {
+            System.out.println("Não há pizzas neste pedido para remover.");
+            return;
+        }
+
+        System.out.println("Pizzas no pedido:");
+        int x = 1;
+        for (Pizza pizza : pedidoParaAlterar.getPizzas()) {
+            System.out.println(x + " - Sabores: " + pizza.getSabores() +
+                    " | Tamanho: " + pizza.getTamanho() +
+                    " | Preço: R$ " + String.format("%.2f", pizza.getPreco()));
+            x++;
+        }
+
+        System.out.print("Digite o número da pizza a ser removida: ");
+        int indicePizza = scanner.nextInt();
+        scanner.nextLine();
+
+        if (indicePizza < 1 || indicePizza > pedidoParaAlterar.getPizzas().size()) {
+            System.out.println("Número de pizza inválido.");
+            return;
+        }
+
+        pedidoParaAlterar.getPizzas().remove(indicePizza - 1);
+
+        pedidoParaAlterar.setValorTotal(somarPizzas(pedidoParaAlterar.getPizzas()));
+
+        System.out.println("Pizza removida com sucesso!");
+    }
+
+    private static void alterarSaborPizza(Scanner scanner, Pedido pedidoParaAlterar) {
+        System.out.println("ALTERAR SABOR DE UMA PIZZA");
+
+        if (pedidoParaAlterar.getPizzas().isEmpty()) {
+            System.out.println("Não há pizzas neste pedido para alterar.");
+            return;
+        }
+
+        System.out.println("Pizzas no pedido:");
+        int x = 1;
+        for (Pizza pizza : pedidoParaAlterar.getPizzas()) {
+            System.out.println(x + " - Sabores: " + pizza.getSabores() +
+                    " | Tamanho: " + pizza.getTamanho() +
+                    " | Preço: R$ " + String.format("%.2f", pizza.getPreco()));
+            x++;
+        }
+
+        System.out.print("Digite o número da pizza a ser alterada: ");
+        int indicePizza = scanner.nextInt();
+        scanner.nextLine();
+
+        if (indicePizza < 1 || indicePizza > pedidoParaAlterar.getPizzas().size()) {
+            System.out.println("Número de pizza inválido.");
+            return;
+        }
+
+        Pizza pizzaParaAlterar = pedidoParaAlterar.getPizzas().get(indicePizza - 1);
+
+        System.out.println("Sabores atuais: " + pizzaParaAlterar.getSabores());
+        System.out.println("Deseja:");
+        System.out.println("1 - Alterar todos os sabores");
+        System.out.println("2 - Alterar um sabor específico");
+        System.out.print("Opção: ");
+        int opcao = scanner.nextInt();
+        scanner.nextLine();
+
+        Cardapio cardapio = new Cardapio();
+        List<String> saboresList = new ArrayList<>();
+
+        if (opcao == 1) {
+            int quantiSabores = 0;
+            while (quantiSabores < 1 || quantiSabores > 4) {
+                System.out.println("Digite a quantidade de sabores: 1 - 4 ");
+                System.out.print("Opção: ");
+                quantiSabores = scanner.nextInt();
+                scanner.nextLine();
+            }
+
+            List<String> novosSabores = new ArrayList<>();
+            for (int i = 0; i < quantiSabores; i++) {
+                System.out.println("Selecione o sabor " + (i + 1) + ": ");
+                saboresList.clear();
+
+                x = 1;
+                for (String sabor : cardapio.getCardapio().keySet()) {
+                    saboresList.add(sabor);
+                    System.out.println(x+" - "+sabor);
+                    x++;
+                }
+                System.out.print("Opção: ");
+                int saborOpcao = scanner.nextInt();
+                scanner.nextLine();
+                novosSabores.add(saboresList.get(saborOpcao-1));
+            }
+
+            pizzaParaAlterar.setSabores(novosSabores);
+            pizzaParaAlterar.setPreco(cardapio.getPrecoJusto(novosSabores));
+
+        } else if (opcao == 2) {
+            System.out.println("Qual sabor deseja alterar?");
+            x = 1;
+            for (String sabor : pizzaParaAlterar.getSabores()) {
+                System.out.println(x + " - " + sabor);
+                x++;
+            }
+            System.out.print("Opção: ");
+            int indiceSabor = scanner.nextInt();
+            scanner.nextLine();
+
+            if (indiceSabor < 1 || indiceSabor > pizzaParaAlterar.getSabores().size()) {
+                System.out.println("Número de sabor inválido.");
+                return;
+            }
+
+            System.out.println("Selecione o novo sabor: ");
+            saboresList.clear();
+            x = 1;
+            for (String sabor : cardapio.getCardapio().keySet()) {
+                saboresList.add(sabor);
+                System.out.println(x+" - "+sabor);
+                x++;
+            }
+            System.out.print("Opção: ");
+            int novoSaborOpcao = scanner.nextInt();
+            scanner.nextLine();
+
+            pizzaParaAlterar.getSabores().set(indiceSabor - 1, saboresList.get(novoSaborOpcao - 1));
+            pizzaParaAlterar.setPreco(cardapio.getPrecoJusto(pizzaParaAlterar.getSabores()));
+
+        } else {
+            System.out.println("Opção inválida.");
+            return;
+        }
+
+        pedidoParaAlterar.setValorTotal(somarPizzas(pedidoParaAlterar.getPizzas()));
+
+        System.out.println("Sabor(es) alterado(s) com sucesso!");
     }
 
     private static void gerarRelatorio(List<Pedido> listaPedidos) {
