@@ -1,16 +1,23 @@
-package Projeto.Leonardo;
+package Projeto.projeto.nova.versao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
-import Projeto.Pizza.TamanhoPizza;
+import Projeto.projeto.nova.versao.Pizza.TamanhoPizza;
 
 public class Pizzaria {
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         List<Cliente> listaClientes = new ArrayList<>();
         List<Pedido> listaPedidos = new ArrayList<>();
+
+        // Adicionando clientes automaticamente para facilitar a execução
+        listaClientes.add(new Cliente("Joao", "Rua A, 123", "111-111", "joao@email.com"));
+        listaClientes.add(new Cliente("Maria", "Rua B, 456", "222-222", "maria@email.com"));
 
         boolean continuar = true;
         while (continuar) {
@@ -33,14 +40,14 @@ public class Pizzaria {
                     fazerPedido(scanner, listaPedidos, listaClientes);
                     break;
                 case 2:
-                    alterarPedido();
+                    alterarPedido(scanner, listaPedidos);
                     break;
                 case 3:
                     listaClientes.add(adicionarCliente(scanner)); 
                     System.out.println("Cliente adicionado com sucesso!");
                     break;
                 case 4:
-                    gerarRelatorio();
+                    gerarRelatorio(listaPedidos);
                     break;
                 case 5:
                     gerarListaClientes(listaClientes);
@@ -76,10 +83,7 @@ public class Pizzaria {
             x = 1;
             System.out.println("Qual o tamanho da pizza? ");
             System.out.println("Selecione um tamanho: ");
-
-
-
-            for (Pizza.TamanhoPizza tamanhos : Pizza.TamanhoPizza.values()) {
+            for (TamanhoPizza tamanhos : Pizza.TamanhoPizza.values()) {
                 System.out.println(x+" - "+tamanhos);
                 x++;
             }
@@ -114,7 +118,7 @@ public class Pizzaria {
                 saboresSelect.add(saboresList.get(opcao-1));
             }
 
-            Pizza pizza = new Pizza(saboresSelect, cardapio.getPrecoJusto(saboresSelect), Pizza.TamanhoPizza.getByIndex(tamanho-1));
+            Pizza pizza = new Pizza(saboresSelect, cardapio.getPrecoJusto(saboresSelect), TamanhoPizza.getByIndex(tamanho-1));
             pizzas.add(pizza);
 
             System.out.println("Pizza cadastrada com sucesso!");
@@ -128,7 +132,8 @@ public class Pizzaria {
                 continuar = false;
             }
         }
-        Pedido pedido = new Pedido(listaPedidos.size()+1,listaClientes.get(cliente-1), pizzas, somarPizzas(pizzas));
+        double frete = calcularFrete(scanner, pizzas.size());
+        Pedido pedido = new Pedido(listaPedidos.size()+1,listaClientes.get(cliente-1), pizzas, somarPizzas(pizzas), frete);
         listaPedidos.add(pedido);
     }
 
@@ -138,10 +143,6 @@ public class Pizzaria {
             valorTotal += pizza.getPreco();
         }
         return valorTotal;
-    }
-
-    private static void alterarPedido() {
-        System.out.println("Alterar pedido");
     }
 
     private static Cliente adicionarCliente(Scanner scanner) {
@@ -164,8 +165,86 @@ public class Pizzaria {
         return cliente;
     }
 
-    private static void gerarRelatorio() {
-        System.out.println("Gerar relatorio");
+    private static void alterarPedido(Scanner scanner, List<Pedido> listaPedidos) {
+        System.out.println("ALTERAR PEDIDO");
+        if (listaPedidos.isEmpty()) {
+            System.out.println("Nenhum pedido para alterar.");
+            return;
+        }
+
+        System.out.println("Selecione o pedido a ser alterado:");
+        for (Pedido p : listaPedidos) {
+            System.out.println(p);
+        }
+        System.out.print("Digite o ID do pedido: ");
+        int idPedido = scanner.nextInt();
+        scanner.nextLine();
+
+        Pedido pedidoParaAlterar = null;
+        for (Pedido p : listaPedidos) {
+            if (p.getId() == idPedido) {
+                pedidoParaAlterar = p;
+                break;
+            }
+        }
+
+        if (pedidoParaAlterar == null) {
+            System.out.println("Pedido não encontrado.");
+            return;
+        }
+
+        System.out.println("O que você deseja fazer?");
+        System.out.println("1 - Adicionar pizza");
+        System.out.println("2 - Remover pizza");
+        System.out.println("3 - Alterar sabor de uma pizza");
+        System.out.print("Opção: ");
+        int opcao = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (opcao) {
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            default:
+                System.out.println("Opção inválida.");
+        }
+    }
+
+    private static void gerarRelatorio(List<Pedido> listaPedidos) {
+        System.out.println("GERAR RELATÓRIO");
+        if (listaPedidos.isEmpty()) {
+            System.out.println("Nenhum pedido para gerar relatório.");
+            return;
+        }
+
+        double faturamentoTotal = 0;
+        Map<String, Integer> saboresMaisPedidos = new HashMap<>();
+
+        for (Pedido pedido : listaPedidos) {
+            faturamentoTotal += pedido.getValorTotal() + pedido.getValorFrete();
+            for (Pizza pizza : pedido.getPizzas()) {
+                for (String sabor : pizza.getSabores()) {
+                    saboresMaisPedidos.put(sabor, saboresMaisPedidos.getOrDefault(sabor, 0) + 1);
+                }
+            }
+        }
+
+        System.out.printf("Faturamento Total: R$ %.2f\n", faturamentoTotal);
+        System.out.println("Sabores mais pedidos: " + saboresMaisPedidos);
+    }
+
+    private static double calcularFrete(Scanner scanner, int quantidadePizzas) {
+        System.out.println("CALCULAR FRETE");
+        System.out.print("Digite a distância em km: ");
+        double distancia = scanner.nextDouble();
+        scanner.nextLine();
+
+        double frete = distancia * 2.5 + quantidadePizzas * 1.5;
+        System.out.printf("Frete: R$ %.2f\n", frete);
+        return frete;
     }
 
     private static void gerarListaClientes(List<Cliente> listaClientes) {
