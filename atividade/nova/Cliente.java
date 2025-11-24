@@ -1,4 +1,4 @@
-package Projeto.projeto.nova.versao;
+package Projeto.atividade.nova;
 
 public class Cliente {
     private String nome;

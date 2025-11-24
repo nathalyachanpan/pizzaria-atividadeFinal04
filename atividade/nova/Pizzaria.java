@@ -1,4 +1,4 @@
-package Projeto.projeto.nova.versao;
+package Projeto.atividade.nova;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import Projeto.projeto.nova.versao.Pizza.TamanhoPizza;
+import Projeto.atividade.nova.Pizza.TamanhoPizza;
 
 public class Pizzaria {
 

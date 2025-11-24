@@ -1,4 +1,4 @@
-package Projeto.projeto.nova.versao;
+package Projeto.atividade.nova;
 
 import java.util.List;
 

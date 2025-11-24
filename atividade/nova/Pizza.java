@@ -1,4 +1,4 @@
-package Projeto.projeto.versao.antiga;
+package Projeto.atividade.nova;
 
 import java.util.List;
 
@@ -50,6 +50,11 @@ public class Pizza {
 
     public void setTamanho(TamanhoPizza tamanho){
         this.tamanho = tamanho;
+    }
+
+    // Método para alterar o sabor da pizza
+    public void alterarSabor(List<String> novosSabores) {
+        this.sabores = novosSabores;
     }
     
 }
